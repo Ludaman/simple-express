@@ -1,29 +1,27 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    service: simpleexpress
   name: simpleexpress
+  labels:
+    app: simpleexpress
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: simpleexpress
   template:
     metadata:
       labels:
-        service: simpleexpress
+        app: simpleexpress
     spec:
       containers:
-      - image: ludaman64/simple-express
-        name: simpleexpress
-        imagePullPolicy: Always          
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "1024Mi"
-            cpu: "500m"       
+      - name: simpleexpress
+        image: ludaman64/simple-express
         ports:
         - containerPort: 8080
-      restartPolicy: Always
-
-
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
